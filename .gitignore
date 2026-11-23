@@ -15,6 +15,5 @@ Thumbs.db
 04_logs/
 05_output/
 06_documentation/
-"Files for Xinyang/"
-"Odd graphics/"
+GitIgnore/
 *.dta

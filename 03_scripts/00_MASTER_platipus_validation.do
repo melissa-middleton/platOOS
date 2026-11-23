@@ -20,21 +20,12 @@
     Section 1 - Data Management
         1.1 - PLUSS Scale derivation
 		1.2	- HIPSTER Scale derivation
-		1.3 - iCOMP Scale derivation
-		1.3 - STRIDER Scale derivation
-		1.4 - VICS Scale derivation
-		1.5 - VIBeS and La Prem Scale derivation
-    Section 2 - Study Aim 1: Description
-		2.1 - PLUSS descriptive analysis
-		2.2	- HIPSTER descriptive analysis
-		2.3 - iCOMP descriptive analysis
-		2.3 - STRIDER descriptive analysis
-		2.4 - VICS descriptive analysis
-		2.5 - VIBeS and La Prem descriptive analysis
-		2.6 - Generation of supplementary table 3: relative frequencies
-    Section 3 - Study Aim 2: Proportional Odds Assessment
-        
-    Section 4 - Study Aim 3: Trial Reanalysis
+		1.4 - STRIDER Scale derivation
+		1.5 - VICS Scale derivation
+		1.6 - VIBeS and La Prem Scale derivation
+    Section 2 - Study Aim 1: Distribution of outcome
+    Section 3 - Study Aim 2: Proportional Odds     
+    Section 4 - Study Aim 3: Reanalysis
 
 */
 
@@ -52,9 +43,6 @@
 	global date: di %td_YYNNDD date(c(current_date), "DMY")
 	global user `c(username)'
 
-    **Set working directory 
-	cd "C:/Users/${user}/Murdoch Children's Research Institute/CEBU Projects - 1879_PLATIPUS - 1879_PLATIPUS/2. Analysis/1. Validation of primary outcome"
-		
 	pwd
 	**Create new ado pathway for stored functions	
 	adopath + "`c(pwd)'/03_scripts"
@@ -86,11 +74,7 @@
 	
 	do 03_scripts/cr02_derive_hipster.do
 	
-	**1.3 iCOMP Scale derivation
-	/*Derivation of iCOMP scale has been completed by Sol Libesman per mapping defintion
-	outlined in 06_documentation/03_outcome_mapping/ValidationMapping_iCOMP.docx*/
-	
-	**1.4 STRIDER Scale derivation
+	**1.3 STRIDER Scale derivation
 	/*The following do-file loads the STRIDER source data and derives the PLATIPUS ordinal
 	outcome per the mapping definition outlined in 06_documentation/03_outcome_mapping/ValidationMapping_STRIDER.docx
 	and stores the ordinal outcome and relevant analysis variables in the derived dataset 
@@ -98,7 +82,7 @@
 	
 	do 03_scripts/cr03_derive_strider.do		
 	
-	**1.5 VICS scale derivation
+	**1.4 VICS scale derivation
 	/*The following do-file loads the VICS source data and derives the PLATIPUS ordinal
 	outcome per the mapping definition outlined in 06_documentation/03_outcome_mapping/ValidationMapping_VICS.docx
 	and stores the ordinal outcome and relevant analysis variables in the derived dataset 
@@ -106,7 +90,7 @@
 	
 	do 03_scripts/cr04_derive_vics.do				
 	
-	**1.6 VIBeS and La Prem scale derivation
+	**1.5 VIBeS and La Prem scale derivation
 	/*The following do-file loads the VIBeS and La Prem source data and derives the PLATIPUS ordinal
 	outcome per the mapping definition outlined in 06_documentation/03_outcome_mapping/ValidationMapping_VIBeS.docx
 	and 06_documentation/03_outcome_mapping/ValidationMapping_LaPrem.docx
@@ -138,7 +122,7 @@
 		graph export  05_output/03_figures/fig2_aim1VICS.png, as(png) replace
 		graph export  05_output/03_figures/fig2_aim1VICS.pdf, as(pdf) replace
 		
-	***Manually edit graphs to remove legend and notes from trials
+	**Manually edit graphs to remove legend and notes from trials
 	**Manually edit vics graph to remove all elements other than legend
 		**offest legend to -50
 	graph combine pluss strider hipster vics, rows(2) imargin(vsmall) note("{it:MV: Mechanical ventilation; ETT: Endotracheal tube; NEC: Necrotising enterocolitis}")
