@@ -1,0 +1,20 @@
+.Rhistory
+.RData
+.Ruserdata
+.vscode/
+logs/
+.DS_Store
+Thumbs.db
+*.log
+01_source_data/
+02_derived_data/
+03_scripts/_ARCHIVE/
+03_scripts/an01_GraphsforWorkshop.do
+03_scripts/an02_STRIDERCountry.do
+03_scripts/an03_iCOMPgraphs.do
+04_logs/
+05_output/
+06_documentation/
+"Files for Xinyang/"
+"Odd graphics/"
+*.dta
