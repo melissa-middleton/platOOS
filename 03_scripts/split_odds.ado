@@ -16,7 +16,9 @@ program define split_odds, rclass
 	syntax [anything] using/  ///
 		[,	exp(string) ///
 			graphname(string) ///
-			strat(string)]
+			titleby(string) ///
+			strat(string) ///
+			xtick(string asis)]
 
 	cap frame drop splitodds
 	frame create splitodds
@@ -42,7 +44,7 @@ program define split_odds, rclass
 	
 	
 	if "`exp'" != "" {
-	
+
 		**Check coding of exposure variable
 		cap desc `exp'
 			if _rc != 0 {
@@ -51,6 +53,13 @@ program define split_odds, rclass
 				frame drop splitodds
 				exit
 			}
+
+		colorpalette HCL reds, n(15) nograph reverse
+
+		**obtain color palette for legend
+		forvalues i = 2/15 {
+    		local col`i' "`r(p`i')'"
+		}
 		
 		**Create the splits and analyse
 		forval i = 2/15 {
@@ -70,8 +79,8 @@ program define split_odds, rclass
 		** Proportional odds model
 		ologit `anything' `exp' `strat' , or 
 				local por = round(exp(_b[`exp']), 0.01)
-				local por_lci = round(exp(_b[`exp'] - 2* _se[`exp']), 0.01)
-				local por_uci = round(exp(_b[`exp'] + 2* _se[`exp']), 0.01)
+				local por_lci = round(exp(_b[`exp'] - invnormal(0.975)* _se[`exp']), 0.01)
+				local por_uci = round(exp(_b[`exp'] + invnormal(0.975)* _se[`exp']), 0.01)
 			
 	
 		********************************************************************************
@@ -114,8 +123,8 @@ program define split_odds, rclass
 			}
 
 			**generate conifdence interval limits
-			gen cil = beta - 2*se
-			gen ciu = beta + 2*se
+			gen cil = beta - invnormal(0.975)*se
+			gen ciu = beta + invnormal(0.975)*se
 
 			**Exponentiate results to display on odds scale
 			gen or = exp(beta)
@@ -127,16 +136,46 @@ program define split_odds, rclass
 			gen por = `por'
 
 			** Generate graphic 
-			twoway (scatter cut or, mcol(navy)) (rcap or_ciu or_cil cut, horizontal lcol(navy)) (scatteri . ., connect(l) lpattern(dash) lcolor(gray) msymbol(i)) (rarea por_lci por_uci cut, lwidth(none) fcolor(gray%20) horizontal) /// 
-				, ///
-				title("Estimated odds ratio for the intervention" "at each binary split of the ordinal outcome") legend(subtitle("Proportional" "Odds Ratio", ) order(3 "Estimate" 4 "95% Confidence" "Interval") position(3) cols(1) size(small)) ///
-				xline(`por', lcolor(gray)) xline(1, lcol(black) lstyle(solid)) ///
-				xtitle("Estimated Odds Ratio") ytitle("Binary Split") ylab(2(1)15,val angle(0)) xscale(log)
-	
+			twoway ///
+    			(scatter cut or if cut == 2, mcolor("`col2'")  msymbol(circle) msize(medium)) ///
+    			(rcap or_ciu or_cil cut if cut == 2, horizontal lcolor("`col2'")) ///
+    			(scatter cut or if cut == 3, mcolor("`col3'") msymbol(circle) msize(medium)) ///
+    			(rcap or_ciu or_cil cut if cut == 3, horizontal lcolor("`col3'")) ///
+    			(scatter cut or if cut == 4, mcolor("`col4'") msymbol(circle) msize(medium)) ///
+    			(rcap or_ciu or_cil cut if cut == 4, horizontal lcolor("`col4'")) ///
+    			(scatter cut or if cut == 5, mcolor("`col5'") msymbol(circle) msize(medium)) ///
+    			(rcap or_ciu or_cil cut if cut == 5, horizontal lcolor("`col5'")) ///
+    			(scatter cut or if cut == 6, mcolor("`col6'") msymbol(circle) msize(medium)) ///
+    			(rcap or_ciu or_cil cut if cut == 6, horizontal lcolor("`col6'")) ///
+    			(scatter cut or if cut == 7, mcolor("`col7'") msymbol(circle) msize(medium)) ///
+    			(rcap or_ciu or_cil cut if cut == 7, horizontal lcolor("`col7'")) ///
+    			(scatter cut or if cut == 8, mcolor("`col8'") msymbol(circle) msize(medium)) ///
+    			(rcap or_ciu or_cil cut if cut == 8, horizontal lcolor("`col8'")) ///
+    			(scatter cut or if cut == 9, mcolor("`col9'") msymbol(circle) msize(medium)) ///
+    			(rcap or_ciu or_cil cut if cut == 9, horizontal lcolor("`col9'")) ///
+    			(scatter cut or if cut == 10, mcolor("`col10'") msymbol(circle) msize(medium)) ///
+    			(rcap or_ciu or_cil cut if cut == 10, horizontal lcolor("`col10'")) ///
+    			(scatter cut or if cut == 11, mcolor("`col11'") msymbol(circle) msize(medium)) ///
+    			(rcap or_ciu or_cil cut if cut == 11, horizontal lcolor("`col11'")) ///
+    			(scatter cut or if cut == 12, mcolor("`col12'") msymbol(circle) msize(medium)) ///
+    			(rcap or_ciu or_cil cut if cut == 12, horizontal lcolor("`col12'")) ///
+    			(scatter cut or if cut == 13, mcolor("`col13'") msymbol(circle) msize(medium)) ///
+    			(rcap or_ciu or_cil cut if cut == 13, horizontal lcolor("`col13'")) ///
+    			(scatter cut or if cut == 14, mcolor("`col14'") msymbol(circle) msize(medium)) ///
+    			(rcap or_ciu or_cil cut if cut == 14, horizontal lcolor("`col14'")) ///
+    			(scatter cut or if cut == 15, mcolor("`col15'") msymbol(circle) msize(medium)) ///
+    			(rcap or_ciu or_cil cut if cut == 15, horizontal lcolor("`col15'")) ///
+    			(rarea por_lci por_uci cut, horizontal fcolor(gs10%20) lcolor(gs10%20) lwidth(none)) ///
+    			(scatteri . ., connect(line) lpattern(dash) lcolor(gs8) msymbol(i)), ///
+    			xline(`por', lcolor(gs8) lpattern(dash)) xline(1, lcolor(black) lpattern(solid)) ///
+    			xscale(log) xtick(`xtick') xlabel(`xtick') xtitle("Estimated odds ratio") ///
+				ylabel(none) ytitle("") ///
+    			title("`titleby'") legend(off) 
+
 			**Export graphic
-			graph export "`graphname'.png", replace
+			*graph export "`graphname'.png", replace
 		} //end frame
-		
+
 		frame change default
 		frame drop splitodds
 		frame drop bin_split

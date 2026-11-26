@@ -106,52 +106,52 @@
 **	SECTION 2 - AIM 1 DISTRIBUTION OF OUTCOME
 ********************************************************************************
 ** Generate Grotta Plots showing the distribution of the outcome for STIRDER, HIPSTER, and PLUSS
-
 	use 02_derived_data/derived_strider.dta, clear
 	lab define trt 1 "Control" 2 "Sildenafil", modify
 
-	grotta_platipus platipus_out using 02_derived_data\derived_hipster.dta, exp(treatment) connected("n")
-		graph rename hipster
-	grotta_platipus plat_out using 02_derived_data\derived_strider.dta, exp(treatment) connected("n")
-		graph rename strider
-	grotta_platipus platipus_out using 02_derived_data/derived_pluss.dta, exp(trt01) connected("n")
+	grotta_platipus platipus_out using 02_derived_data\derived_hipster.dta, exp(treatment) connected("n") titleby("HIPSTER")
+		graph rename hipster, replace
+	grotta_platipus plat_out using 02_derived_data\derived_strider.dta, exp(treatment) connected("n") titleby("STRIDER")
+		graph rename strider, replace
+	grotta_platipus platipus_out using 02_derived_data/derived_pluss.dta, exp(trt01) connected("n") titleby("PLUSS")
 		graph rename pluss, replace 
-	grotta_platipus platipus_out using 02_derived_data\derived_vics.dta, exp(grp) graphname(05_output\03_figures\aim1_VICS) titleby("by prematurity") connected("n")	
+	grotta_platipus platipus_out using 02_derived_data\derived_vics.dta, titleby("VICS - preterm infants only") connected("n")	
 		graph rename vics, replace
-		graph save vics 05_output/03_figures/fig2_aim1VICS.grp, replace
-		graph export  05_output/03_figures/fig2_aim1VICS.png, as(png) replace
-		graph export  05_output/03_figures/fig2_aim1VICS.pdf, as(pdf) replace
-		
-	**Manually edit graphs to remove legend and notes from trials
-	**Manually edit vics graph to remove all elements other than legend
-		**offest legend to -50
-	graph combine pluss strider hipster vics, rows(2) imargin(vsmall) note("{it:MV: Mechanical ventilation; ETT: Endotracheal tube; NEC: Necrotising enterocolitis}")
-	**Manually add panel labelling
-	graph save 		05_output/03_figures/fig3_aim1Trials.grp
-	graph export 	05_output/03_figures/fig3_aim1Trials.png, as(png)
-	graph export	05_output/03_figures/fig3_aim1Trials.pdf, as(pdf)
+
+	**create legend graph
+	grotta_legend
+		graph rename legend, replace
+		graph export 	05_output/03_figures/fig3a_legend.png, as(png) replace
+
+	**Combine graphs into a single figure
+	graph combine vics pluss strider hipster, ///
+    cols(2) ///
+    imargin(small) ///
+    graphregion(color(white)) ///
+    name(grotta_panels, replace)
+
+	graph export 	05_output/03_figures/fig3a_panels.png, as(png)
 		
 ********************************************************************************
 ** SECTION 3 - AIM 2 PROPORTIONAL ODDS
 ********************************************************************************
 
-	split_odds platipus_out using 01_source_data\PLUSS_for_PLATIPUS_oct23.dta, exp(trt01) graphname(05_output\03_figures\aim2_PLUSS) strat("i.pistratsurf i.pistratres i.pistratgest")
+	split_odds platipus_out using 01_source_data\PLUSS_for_PLATIPUS_oct23.dta, exp(trt01) graphname(05_output\03_figures\aim2_PLUSS) strat("i.pistratsurf i.pistratres i.pistratgest") titleby("PLUSS") xtick(0.75 1 1.5 2 2.5 3)
 		graph rename pluss, replace 
-	split_odds plat_out using 02_derived_data\derived_strider.dta, exp(treatment) graphname(05_output\03_figures\aim2_STRIDER) strat("i.secondary_identifier_site i.stratgest")
+	split_odds plat_out using 02_derived_data\derived_strider.dta, exp(treatment) graphname(05_output\03_figures\aim2_STRIDER) strat("i.secondary_identifier_site i.stratgest") titleby("STRIDER") xtick(0.75 1 1.5 2 2.5 3)
 		graph rename strider, replace
-	split_odds platipus_out using 02_derived_data\derived_hipster.dta, exp(treatment) graphname(05_output\03_figures\aim2_HIPSTER) strat("i.centre i.stratgest")
+	split_odds platipus_out using 02_derived_data\derived_hipster.dta, exp(treatment) graphname(05_output\03_figures\aim2_HIPSTER) strat("i.centre i.stratgest") titleby("HIPSTER") xtick(0.2 0.5 1 2 5 10 20 30)
 		graph rename hipster, replace
-	split_odds platipus_out using 02_derived_data\derived_vics.dta, exp(anster) graphname(05_output\03_figures\aim2_VICS) strat("i.male datesbest bweight")
-		graph rename vics, replace
 	
-	**Manually edit graphs to remove title and legend from trial graphs and keep legend from VICS
-		**Manually update ticks
+	**create legend graph
+	split_legend
+		graph rename legend, replace
+
 	
-	graph combine pluss strider hipster vics, rows(2) imargin(vsmall)
+	graph combine pluss strider hipster legend, rows(2) imargin(vsmall)
 	
-	graph save 		05_output/03_figures/fig5_aim3.grp
-	graph export 	05_output/03_figures/fig5_aim3.png, as(png)
-	graph export	05_output/03_figures/fig5_aim3.pdf, as(pdf)
+	graph export 	05_output/03_figures/supp_fig1.png, as(png)
+
 		
 	
 	
@@ -209,23 +209,25 @@ putexcel set 05_output\04_tables\aim3_trialreanalysis.xlsx, replace
 		di 100*((ord_se/bin_se)^2-1)
 			//-76.67%
 
+		
+
 **Create graph
-twoway 	(scatteri 3.1 0.94 2.1 1.5 1.1 1.06 , mcol(lavender)) ///
-		(scatteri 2.9 1.19 1.9 2.33 0.9 1.12, mcol(dkorange)) ///
-		(pci 3.1 0.75 3.1 1.17 2.1 1.07 2.1 2.11 1.1 0.74 1.1 1.51 , recast(pccapsym) msymbol(pipe) lcol(lavender) mcol(lavender)) ///
-		(pci 2.9 0.89 2.9 1.61 1.9 1.48 1.9 3.67 0.9 0.73 0.9 1.74 , recast(pccapsym) msymbol(pipe) lcol(dkorange) mcol(dkorange)) ///
-		(scatteri 2.55 2.8 2.55 3.1 "pOR and 95% CI", msy(pipe) connect(line)  mc(lavender) lc(lavender) mlabsize(small) mlabcolor(black)) ///
-		(scatteri 2.45 2.8 2.45 3.1 "OR and 95% CI", msy(pipe) connect(line)  mc(dkorange) lc(dkorange) mlabsize(small) mlabcolor(black)) ///
-		(scatteri 2.55 2.95, msy(circle)  msize(vsmall) mc(lavender)) ///
-        (scatteri 2.45 2.95, msy(circle)  msize(vsmall) mc(dkorange)) ///
+twoway 	(scatteri 3.1 0.94 2.1 1.5 1.1 1.06 , mcol("125 1 18") msize(medlarge)) ///
+		(scatteri 2.9 1.19 1.9 2.33 0.9 1.12, mcol("219 174 170") msize(medlarge)) ///
+		(pci 3.1 0.75 3.1 1.17 2.1 1.07 2.1 2.11 1.1 0.74 1.1 1.51 , recast(pccapsym) msymbol(pipe) msize(medlarge) lwidth(medthick) lcol("125 1 18") mcol("125 1 18")) ///
+		(pci 2.9 0.89 2.9 1.61 1.9 1.48 1.9 3.67 0.9 0.73 0.9 1.74 , recast(pccapsym) msymbol(pipe)  msize(medlarge) lwidth(medthick) lcol("219 174 170") mcol("219 174 170")) ///
+		(scatteri 2.55 2.8 2.55 3.1 "pOR and 95% CI", msy(pipe) connect(line) mc("125 1 18") msize(medlarge) lwidth(medthick) lc("125 1 18") mlabsize(small) mlabcolor(black)) ///
+		(scatteri 2.45 2.8 2.45 3.1 "OR and 95% CI", msy(pipe) connect(line) mc("219 174 170") msize(medlarge) lwidth(medthick) lc("219 174 170") mlabsize(small) mlabcolor(black)) ///
+		(scatteri 2.55 2.95, msy(circle)  msize(medlarge) mc("125 1 18")) ///
+        (scatteri 2.45 2.95, msy(circle)  msize(medlarge) mc("219 174 170")) ///
 		, ///
 		legend(off) xscale(log) ///
 		ylabel(1 "STRIDER" 2 "HIPSTER" 3 "PLUSS") ytitle("") xtitle("") ///
 		xline(1) note("{it:Note: PLUSS binary outcome is positive coded while PLATIPUS ordinal outcome is negative coded}", size(small))
 			
-		graph save 		05_output/03_figures/fig4_aim2.grp, replace
-		graph export 	05_output/03_figures/fig4_aim2.png, as(png) replace
-		graph export	05_output/03_figures/fig4_aim2.pdf, as(pdf) replace
+		graph save 		05_output/03_figures/fig3b.grp, replace
+		graph export 	05_output/03_figures/fig3b.png, as(png) replace
+		graph export	05_output/03_figures/fig3b.pdf, as(pdf) replace
 
 			
 **Close the master log

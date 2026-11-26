@@ -38,8 +38,6 @@ program define grotta_platipus, rclass
 			frame drop grotta
 			exit
 		}
-		
-	
 	
 	if "`exp'" != "" {
 		**Check coding of exposure variable
@@ -50,15 +48,18 @@ program define grotta_platipus, rclass
 				frame drop grotta
 				exit
 			}
+		
 		**Get level values for exposure
 		qui levelsof `exp'
 		local lvl1 = "`: word 1 of `r(levels)''"
 		local lvl2 = "`: word 2 of `r(levels)''"
+
 		**Obtain totals for treatment and control groups
-		qui count if `exp' == `lvl1'
+		qui count if `exp' == `lvl1' & `anything' != .
 			local t`lvl1' = r(N)
-		qui count if `exp' == `lvl2'
+		qui count if `exp' == `lvl2' & `anything' != .
 			local t`lvl2' = r(N)
+
 		**Obtain cumulative proportions for each level of ordinal outcome
 		forval i = 1/15 {
 			qui count if `anything' <= `i' & `exp' == `lvl1'
@@ -121,14 +122,8 @@ program define grotta_platipus, rclass
 						(scatter top mid, mlab(lab_top) mlabposition(0) msymbol(i) mlabcol(black)) ///
 						(scatter bot mid, mlab(lab_bot) mlabposition(0) msymbol(i) mlabcol(black)), ///
 					yscale(off) xtitle("Percentage") xlab(0(10)100,nogrid) ylab(, nogrid) ysize(5) ///
-					legend(order(- " " - " " - " " 1 "None of the below" 2 "Admitted to neonatal unit <48hrs" ///
-									3 "Admitted neonatal unit >=48hrs" 4 "Non-invasive respiratory support" ">=1 and < 5 days"  5 "Non-invasive respiratory support" ">= 5 days" ///
-									6 "MV via ETT for >= 1 and < 7 days" 7 "MV via ETT for >= 7 days" 8 "Moderate respiratory morbidity" ///
-									9 "NEC/Sepsis" 10 "Severe respiratory morbidity" 11 "Major surgery" ///
-									12 "Brain injury" 13 "Two of: sev. respiratory morbidity," "major surgery, or brain injury" ///
-									14 "Severe respiratory morbidity AND" "major surgery AND brain injury"  ///
-									15 "Death" - " " - " " - " ") size(vsmall) position(3) bmargin(zero)) ///
-					title("", justification(left)) note("{it:resp.: respiratory, MV: mechanical ventilation, ETT: endotracheal tube, NEC: Necrotizing enterocolitis}")
+					legend(off) ///
+					title("`titleby'", justification(left)) 
 		}
 		else {
 			forval i = 1/15 {
@@ -194,14 +189,8 @@ program define grotta_platipus, rclass
 						(scatter top mid, mlab(lab_top) mlabposition(0) msymbol(i) mlabcol(black)) ///
 						(scatter bot mid, mlab(lab_bot) mlabposition(0) msymbol(i) mlabcol(black)), ///
 					yscale(off) xtitle("Percentage") xlab(0(10)100,nogrid) ylab(, nogrid) ysize(5) ///
-					legend(order(- " " - " " - " " 1 "None of the below" 2 "Admitted to neonatal unit <48hrs" ///
-									3 "Admitted neonatal unit >=48hrs" 4 "Non-invasive resp. support >=1 and < 5 days"  5 "Non-invasive resp. support >= 5 days" ///
-									6 "MV via ETT for >= 1 and < 7 days" 7 "MV via ETT for >= 7 days" 8 "Moderate resp. morbidity" ///
-									9 "NEC/Sepsis" 10 "Severe resp. morbidity" 11 "Major surgery" ///
-									12 "Brain injury" 13 "Two of: severe resp. morbidity, major surgery, or" "brain injury" ///
-									14 "Severe resp. morbidity AND major surgery"  "AND brain injury"  ///
-									15 "Death" - " " - " " - " ") size(vsmall) position(3) bmargin(zero)) ///
-					title(" ", justification(left)) note("{it:resp.: respiratory, MV: mechanical ventilation, ETT: endotracheal tube, NEC: Necrotizing enterocolitis}")
+					legend(off) ///
+					title("`titleby'", justification(left))
 		}
 	}
 	else {
@@ -209,7 +198,7 @@ program define grotta_platipus, rclass
 		qui count if `anything' != .
 		local tn = r(N)
 		
-	**Obtain cumulative proportions for each level of ordinal outcome
+		**Obtain cumulative proportions for each level of ordinal outcome
 		forval i = 1/15 {
 			qui count if `anything' <= `i' 
 			gen c`i' = r(N)/`tn'*100
@@ -246,14 +235,8 @@ program define grotta_platipus, rclass
 				(rarea c14 c15 x, lwidth(none) horizontal col("`r(p15)'")) ///
 				, ///
 			yscale(off) xtitle("Percentage") xlab(0(10)100,nogrid) ylab(, nogrid) ysize(5) ///
-			legend(order(- " " - " " - " " 1 "None of the below" 2 "Admitted to neonatal unit <48hrs" ///
-							3 "Admitted neonatal unit >=48hrs" 4 "Non-invasive resp. support >=1 and < 5 days"  5 "Non-invasive resp. support >= 5 days" ///
-							6 "MV via ETT for >= 1 and < 7 days" 7 "MV via ETT for >= 7 days" 8 "Moderate resp. morbidity" ///
-							9 "NEC/Sepsis" 10 "Severe resp. morbidity" 11 "Major surgery" ///
-							12 "Brain injury" 13 "Two of: severe resp. morbidity, major surgery, or" "brain injury" ///
-							14 "Severe resp. morbidity AND major surgery"  "AND brain injury"  ///
-							15 "Death" - " " - " " - " ") size(vsmall) position(3) bmargin(zero)) ///
-			title(" ", justification(left)) note("{it:resp.: respiratory, MV: mechanical ventilation, ETT: endotracheal tube, NEC: Necrotizing enterocolitis}")
+			legend(off) ///
+			title("`titleby'", justification(left))
 	}
 	
 	graph export "`graphname'.png", replace
